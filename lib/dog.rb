@@ -54,10 +54,8 @@ class Dog
   end
   
   def self.new_from_db(row)
-    dog = Dog.new(row[0], row[1], row[2])
-    dog.id = row[0] 
-    dog.name = row[1] 
-    dog.breed = row[2]
+    #binding.pry
+    dog = Dog.new(id: row[0], name: row[1], breed: row[2])
     dog
   end
   
@@ -67,8 +65,21 @@ class Dog
     WHERE id = ?
     SQL
     
-    self.new_from_db(DB[:conn].execute(sql, id))
+    row = (DB[:conn].execute(sql, id).flatten)
+    self.new_from_db(row)
+  end
+  
+  def self.find_by_name(name)
+    sql = <<-SQL
+    SELECT * FROM dogs
+    WHERE name = ?
+    LIMIT 1
+    SQL
     
+    DB[:conn].execute(sql, name).map do |row|
+      #binding.pry
+      self.new_from_db(row)
+    end
   end
   
 end
